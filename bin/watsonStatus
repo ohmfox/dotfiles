@@ -1,0 +1,2 @@
+#!/bin/zsh
+watson status | awk '{gsub(/(Project|started|\(.+\))/, ""); print}'

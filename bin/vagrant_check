@@ -1,0 +1,15 @@
+#!/bin/zsh -f
+if 2> /dev/null 1>&2 (vagrant global-status | grep running) ; then
+  vagrant global-status | grep running | awk '
+    {count++}
+    END{
+      if(count==1) { 
+        "basename "$5 | getline name
+        print name" running"
+      } else {
+        print count" running"
+      }
+    }'
+else
+  echo "no vagrant"
+fi
