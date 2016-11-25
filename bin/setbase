@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export CD_BASE=`pwd`
+
+echo "cd base set to $CD_BASE"

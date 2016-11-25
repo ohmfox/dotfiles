@@ -5,46 +5,72 @@ filetype off                  " required
 " Vundle setup
 let path='$HOME/.config/nvim/bundle'
 call plug#begin('~/.config/nvim/plugged')
+" Functionality
 Plug 'kien/ctrlp.vim'
 Plug 'rking/ag.vim'
-Plug 'jelera/vim-javascript-syntax'
-Plug 'pangloss/vim-javascript'
-Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-commentary'
+Plug 'junegunn/limelight.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'vim-scripts/mru.vim'
 Plug 'tpope/vim-surround'
-Plug 'groenewege/vim-less'
-Plug 'othree/html5-syntax.vim'
 Plug 'terryma/vim-expand-region'
 Plug 'Raimondi/delimitMate'
 Plug 'ohmfox/NerdIgnore'
+Plug 'ohmfox/ProjectLevel'
 Plug 'tpope/vim-git'
-Plug 'elixir-lang/vim-elixir'
-Plug 'freeo/vim-kalisi'
-Plug 'isRuslan/vim-es6'
-Plug 'posva/vim-vue'
 function! DoRemote(arg)
-  UpdateRemotePlugins
+	UpdateRemotePlugins
 endfunction
 Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-Plug 'elixir-lang/vim-elixir'
-Plug 'sophacles/vim-bundle-mako'
 Plug 'itchyny/lightline.vim'
 Plug 'mhinz/vim-signify'
 Plug 'mbbill/undotree'
-Plug 'ap/vim-buftabline'
 Plug 'moll/vim-bbye'
-Plug 'PProvost/vim-markdown-jekyll'
+
+" Syntax & Languages
+Plug 'groenewege/vim-less'
+Plug 'jelera/vim-javascript-syntax'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
 Plug 'sekel/vim-vue-syntastic'
+Plug 'elixir-lang/vim-elixir'
+Plug 'sophacles/vim-bundle-mako'
+Plug 'StanAngeloff/php.vim'
+Plug 'captbaritone/better-indent-support-for-php-with-html'
+Plug 'mustache/vim-mustache-handlebars'
+Plug 'kern/vim-es7'
+Plug 'othree/es.next.syntax.vim'
+Plug 'posva/vim-vue'
+Plug 'lambdatoast/elm.vim'
+Plug 'othree/html5-syntax.vim'
+Plug 'wavded/vim-stylus'
+
+" Themes
+Plug 'freeo/vim-kalisi'
+Plug 'flazz/vim-colorschemes'
 Plug 'git@bitbucket.org:kisom/eink.vim.git'
 Plug 'robertmeta/nofrils'
+Plug 'roosta/vim-srcery'
+
 Plug 'ervandew/supertab'
+Plug 'jaxbot/semantic-highlight.vim'
 Plug 'ternjs/tern_for_vim', {'do':'npm install '}
 Plug 'junegunn/fzf', { 'do': 'yes \| ./install' }
+
+" Writing Plugins
+Plug 'reedes/vim-wordy'
+Plug 'reedes/vim-lexical'
+Plug 'reedes/vim-textobj-sentence'
+Plug 'reedes/vim-textobj-quote'
+Plug 'reedes/vim-litecorrect'
+Plug 'reedes/vim-pencil'
+Plug 'PProvost/vim-markdown-jekyll'
+Plug 'tpope/vim-markdown'
+Plug 'junegunn/goyo.vim'
+
 call plug#end()
 
 filetype on
@@ -54,7 +80,7 @@ set termguicolors
 syntax enable
 
 set background=dark
-colorscheme eink
+colorscheme srcery
 
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 highlight VertSplit ctermbg=NONE
@@ -75,84 +101,92 @@ imap <F5> <C-R>=strftime("%Y-%m-%d %a %I:%M %p")<CR>
 
 " ------------------------------------------------------------ LIGHTLINE
 let g:lightline = {
-      \ 'colorscheme': 'seoul256',
-      \ 'component_function': {
-      \   'readonly': 'LightLineReadonly',
-      \   'modified': 'LightLineModified',
-      \   'fileformat': 'LightLineFileformat',
-      \   'ctrlpmark': 'CtrlPMark',
-      \   'filetype': 'LightLineFiletype',
-      \   'filename': 'LightLineFilename',
-      \ },
-      \ 'active': {
-      \   'left': [ [ 'filename'], [ 'readonly', 'modified' ]],
-      \   'right': [ [ 'lineinfo' ], [ 'ctrlpmark' ]]
-      \ },
-      \ 'separator': { 'left': '', 'right': '', },
-      \ 'subseparator': { 'left': '|', 'right': '|', },
-      \ }
+			\ 'colorscheme': 'seoul256',
+			\ 'component_function': {
+			\   'readonly': 'LightLineReadonly',
+			\   'modified': 'LightLineModified',
+			\   'fileformat': 'LightLineFileformat',
+			\   'ctrlpmark': 'CtrlPMark',
+			\   'filetype': 'LightLineFiletype',
+      \   'syntastic': 'LightLineSyntastic',
+			\   'filename': 'LightLineFilename',
+			\ },
+			\ 'active': {
+			\   'left': [ [ 'filename'], [ 'readonly', 'modified' ]],
+			\   'right': [ [ 'lineinfo', 'syntastic' ], [ 'ctrlpmark' ]]
+			\ },
+			\ 'separator': { 'left': ' ', 'right': ' ', },
+			\ 'subseparator': { 'left': '|', 'right': '|', },
+			\ }
 set noshowmode
 function! LightLineFilename()
-  let fname = expand('%:t')
-  return fname == 'ControlP' ? g:lightline.ctrlp_item :
-        \ fname == '__Tagbar__' ? g:lightline.fname :
-        \ fname =~ '__Gundo\|NERD_tree' ? '' :
-        \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-        \ &ft == 'unite' ? unite#get_status_string() :
-        \ &ft == 'vimshell' ? vimshell#get_status_string() :
-        \ ('' != fname ? fname : '[No Name]')
+	let fname = expand('%:t')
+	return fname == 'ControlP' ? g:lightline.ctrlp_item :
+				\ fname == '__Tagbar__' ? g:lightline.fname :
+				\ fname =~ '__Gundo\|NERD_tree' ? '' :
+				\ &ft == 'vimfiler' ? vimfiler#get_status_string() :
+				\ &ft == 'unite' ? unite#get_status_string() :
+				\ &ft == 'vimshell' ? vimshell#get_status_string() :
+				\ ('' != fname ? fname : '[No Name]')
 endfunction
 function! LightLineModified()
-  if &filetype == "help"
-    return ""
-  elseif &modified
-    return "💀"
-  elseif &modifiable
-    return "🍕"
+	if &filetype == "help"
+		return ""
+	elseif &modified
+		return "💀"
+	elseif &modifiable
+		return "🍕"
+	else
+		return "🍕"
+	endif
+endfunction
+
+function! LightLineSyntastic()
+  if SyntasticStatuslineFlag() == ""
+    return "a"
   else
-    return "🍕"
-  endif
+    return "b"
 endfunction
 
 function! LightLineReadonly()
-  if &filetype == "help"
-    return "🐙"
-  elseif &readonly
-    return "🐙"
-  else
-    return ""
-  endif
+	if &filetype == "help"
+		return "🐙"
+	elseif &readonly
+		return "🐙"
+	else
+		return ""
+	endif
 endfunction
 function! CtrlPMark()
-  if expand('%:t') =~ 'ControlP'
-    call lightline#link('iR'[g:lightline.ctrlp_regex])
-    return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
-          \ , g:lightline.ctrlp_next], 0)
-  else
-    return ''
-  endif
+	if expand('%:t') =~ 'ControlP'
+		call lightline#link('iR'[g:lightline.ctrlp_regex])
+		return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
+					\ , g:lightline.ctrlp_next], 0)
+	else
+		return ''
+	endif
 endfunction
 let g:ctrlp_status_func = {
-  \ 'main': 'CtrlPStatusFunc_1',
-  \ 'prog': 'CtrlPStatusFunc_2',
-  \ }
+			\ 'main': 'CtrlPStatusFunc_1',
+			\ 'prog': 'CtrlPStatusFunc_2',
+			\ }
 
 function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
-  let g:lightline.ctrlp_regex = a:regex
-  let g:lightline.ctrlp_prev = a:prev
-  let g:lightline.ctrlp_item = a:item
-  let g:lightline.ctrlp_next = a:next
-  return lightline#statusline(0)
+	let g:lightline.ctrlp_regex = a:regex
+	let g:lightline.ctrlp_prev = a:prev
+	let g:lightline.ctrlp_item = a:item
+	let g:lightline.ctrlp_next = a:next
+	return lightline#statusline(0)
 endfunction
 
 function! CtrlPStatusFunc_2(str)
-  return lightline#statusline(0)
+	return lightline#statusline(0)
 endfunction
 
 " Reload Vim when .vimrc is changed
 augroup reload_vimrc
-    autocmd!
-    autocmd bufwritepost $MYVIMRC nested source $MYVIMRC
+	autocmd!
+	autocmd bufwritepost $MYVIMRC nested source $MYVIMRC
 augroup END
 
 " ------------------------------------------------------------ LEADER
@@ -170,6 +204,7 @@ imap <C-c> <CR><Esc>O
 
 " unhighlight everything
 nnoremap <Leader>x :noh<CR>
+nnoremap <Leader>q :Bdelete<CR>
 
 """"" Buffer navigation (<Space>,) (<Space>]) (<Space>[) (<space>ls)
 map <Leader>, <C-^>
@@ -181,7 +216,6 @@ nnoremap <Leader>mv ddGp``
 "copy current line to the end of buffer without moving cursor
 nnoremap <Leader>cp YGp``
 
-map <leader>bc :Bdelete<CR>
 map <Leader>sc :setlocal spell<esc>
 
 " ------------------------------------------------------------ INDENTATION
@@ -212,17 +246,17 @@ map J <Plug>(expand_region_shrink)
 let g:deoplete#enable_at_startup = 1
 
 let g:expand_region_text_objects = {
-      \ 'iw'  :0,
-      \ 'iW'  :0,
-      \ 'i"'  :0,
-      \ 'i''' :0,
-      \ 'i]'  :1,
-      \ 'ib'  :1, 
-      \ 'iB'  :1,
-      \ 'il'  :0,
-      \ 'ip'  :0,
-      \ 'ie'  :0,
-      \ }
+			\ 'iw'  :0,
+			\ 'iW'  :0,
+			\ 'i"'  :0,
+			\ 'i''' :0,
+			\ 'i]'  :1,
+			\ 'ib'  :1, 
+			\ 'iB'  :1,
+			\ 'il'  :0,
+			\ 'ip'  :0,
+			\ 'ie'  :0,
+			\ }
 
 set shortmess=atI                     " no stupid intro message
 set showmode                          " Show the current mode.
@@ -262,13 +296,13 @@ set directory=~/.config/nvim/swaps            " use global swaps directory
 set undodir=~/.config/nvim/undo               " use global undo directory
 
 if has('persistent_undo')
-    set rtp+=~/configit/vim/modules/undotree
-    nnoremap <silent> <Space>u :UndotreeToggle<CR>
-    let g:undotree_SetFocusWhenToggle = 1
-    set undofile
-    set undodir=~/.undodir/
-    set undolevels=1000
-    set undoreload=10000
+	set rtp+=~/configit/vim/modules/undotree
+	nnoremap <silent> <Space>u :UndotreeToggle<CR>
+	let g:undotree_SetFocusWhenToggle = 1
+	set undofile
+	set undodir=~/.undodir/
+	set undolevels=1000
+	set undoreload=10000
 endif
 
 " ------------------------------------------------------------ MOVEMENT
@@ -303,34 +337,35 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 1
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
+nnoremap <Leader>e :SyntasticCheck<CR>
 let g:syntastic_javascript_checkers = ["eslint"]
 let g:syntastic_vue_checkers = ['eslint']
 
 " ------------------------------------------------------------ SUPERTAB
-autocmd FileType javascript let g:SuperTabDefaultCompletionType = "<c-x><c-o>"  
+autocmd FileType javascript let g:SuperTabDefaultCompletionType = "<C-x><C-o>"  
 set completeopt-=preview  
 
 " ------------------------------------------------------------ NERDTREE
-" autocmd vimenter * NERDTree         " use nerdtree on open
 autocmd VimEnter * wincmd p
 noremap <C-\> :NERDTreeToggle<CR>         " use ctrl-\ to open nerdtree
-autocmd StdinReadPre * let s:std_in=1 "
+autocmd StdinReadPre * let s:std_in=1
 """""
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 """""
-let g:NERDTreeWinPos = "right"        " set nerdtree to right side
+let g:NERDTreeWinPos = "left"        " set nerdtree to right side
 function! s:CloseIfOnlyControlWinLeft()
-  if winnr("$") != 1
-    return
-  endif
-  if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
-        \ || &buftype == 'quickfix'
-    q
-  endif
+	if winnr("$") != 1
+		return
+	endif
+	if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
+				\ || &buftype == 'quickfix'
+		q
+	endif
 endfunction
 augroup CloseIfOnlyControlWinLeft
-  au!
-  au BufEnter * call s:CloseIfOnlyControlWinLeft()
+	au!
+	au BufEnter * call s:CloseIfOnlyControlWinLeft()
 augroup END
 
 
@@ -340,10 +375,37 @@ autocmd Filetype gitcommit setlocal spell textwidth=72
 " ------------------------------------------------------------ Random
 au BufNewFile,BufRead *.mak set filetype=mako
 
-" ------------------------------------------------------------ Refactor
-nmap <leader>rf :call Refactor()<CR>
-function! Refactor()
-  let rf1 = inputdialog("From: ")
-  let rf2 = inputdialog("To: ")
-  exe "normal! :%s/\(.*\)". rf1 ."(.*\)/mv & \1". rf2 ."\2<CR>"
+" ------------------------------------------------------------ Terminal Mode Settings
+tnoremap <Esc> <C-\><C-n>
+
+
+" ------------------------------------------------------------ Writing
+map <Leader>f :Goyo<cr>
+function! MarkdownOn()
+  set spell spelllang=en_us
+  highlight CursorLine ctermbg=NONE
 endfunction
+
+autocmd Filetype markdown call MarkdownOn()
+
+augroup pencil
+  autocmd!
+  autocmd FileType markdown,mkd,md call pencil#init()
+  autocmd FileType text         call pencil#init()
+augroup END
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+augroup lexical
+  autocmd!
+  autocmd FileType markdown,mkd call lexical#init()
+  autocmd FileType textile call lexical#init()
+  autocmd FileType text call lexical#init({ 'spell': 0 })
+augroup END
+let g:lexical#thesaurus_key = '<Leader>t'
+
+let g:jsx_ext_required = 0
+
+
+" ------------------------------------------------------------ Macros
+nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
+
