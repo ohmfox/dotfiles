@@ -405,6 +405,7 @@ let g:lexical#thesaurus_key = '<Leader>t'
 
 let g:jsx_ext_required = 0
 
+set inccommand=split
 
 " ------------------------------------------------------------ Macros
 nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
