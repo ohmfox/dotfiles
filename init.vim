@@ -7,6 +7,7 @@ let path='$HOME/.config/nvim/bundle'
 call plug#begin('~/.config/nvim/plugged')
 " Functionality
 Plug 'kien/ctrlp.vim'
+Plug 'FredKSchott/CoVim'
 Plug 'rking/ag.vim'
 Plug 'tpope/vim-commentary'
 Plug 'junegunn/limelight.vim'
@@ -31,33 +32,20 @@ Plug 'mbbill/undotree'
 Plug 'moll/vim-bbye'
 
 " Syntax & Languages
-Plug 'groenewege/vim-less'
-Plug 'jelera/vim-javascript-syntax'
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
+Plug 'sheerun/vim-polyglot'
 Plug 'sekel/vim-vue-syntastic'
-Plug 'elixir-lang/vim-elixir'
-Plug 'sophacles/vim-bundle-mako'
-Plug 'StanAngeloff/php.vim'
 Plug 'captbaritone/better-indent-support-for-php-with-html'
-Plug 'mustache/vim-mustache-handlebars'
-Plug 'kern/vim-es7'
-Plug 'othree/es.next.syntax.vim'
-Plug 'posva/vim-vue'
-Plug 'lambdatoast/elm.vim'
-Plug 'othree/html5-syntax.vim'
-Plug 'wavded/vim-stylus'
 
 " Themes
 Plug 'freeo/vim-kalisi'
 Plug 'flazz/vim-colorschemes'
-Plug 'git@bitbucket.org:kisom/eink.vim.git'
-Plug 'robertmeta/nofrils'
-Plug 'roosta/vim-srcery'
+Plug 'joshdick/onedark.vim'
 
 Plug 'ervandew/supertab'
 Plug 'jaxbot/semantic-highlight.vim'
-Plug 'ternjs/tern_for_vim', {'do':'npm install '}
+Plug 'ternjs/tern_for_vim', {'do': 'npm install'}
+Plug 'othree/jspc.vim'
+Plug 'moll/vim-node'
 Plug 'junegunn/fzf', { 'do': 'yes \| ./install' }
 
 " Writing Plugins
@@ -80,7 +68,7 @@ set termguicolors
 syntax enable
 
 set background=dark
-colorscheme srcery
+colorscheme onedark
 
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 highlight VertSplit ctermbg=NONE
@@ -310,15 +298,17 @@ endif
 nmap <Leader>e <Plug>(easymotion-prefix)
 """""
 
-" ------------------------------------------------------------ COPY/PASTE
-""""" LEADER COPY/CUT/PASTE COMMMANDS
+" ------------------------------------------------------------ STRING
+""""" LEADER COPY/CUT/PASTE/REPLACE COMMMANDS
 vmap <Leader>y "+y
 vmap <Leader>d "+d
 nmap <Leader>p "+p
 nmap <Leader>P "+P
 vmap <Leader>p "+p
 vmap <Leader>P "+P
+vmap <Leader>r "hy:%s/<C-r>h//gc<left><left><left>
 """""
+
 
 " ------------------------------------------------------------ CTRLP
 let g:ctrlp_match_window = 'bottom,order:ttb'
@@ -377,6 +367,7 @@ au BufNewFile,BufRead *.mak set filetype=mako
 
 " ------------------------------------------------------------ Terminal Mode Settings
 tnoremap <Esc> <C-\><C-n>
+set inccommand=split
 
 
 " ------------------------------------------------------------ Writing
@@ -406,6 +397,7 @@ let g:lexical#thesaurus_key = '<Leader>t'
 let g:jsx_ext_required = 0
 
 set inccommand=split
+autocmd Filetype gitcommit setlocal spell textwidth=72
 
 " ------------------------------------------------------------ Macros
 nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
