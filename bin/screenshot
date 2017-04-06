@@ -1,0 +1,2 @@
+#!/bin/bash
+phantomjs $HOME/bin/rasterize.js $1 $2

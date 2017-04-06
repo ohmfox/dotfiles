@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Custom linting tool for css/scss
+
+default="css"
+
+filetype=${1-$default}
+
+echo "Checking $filetype files"
+
+ack --${filetype} -i "background:\s*\S*;"
