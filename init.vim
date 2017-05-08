@@ -5,9 +5,8 @@ filetype off                  " required
 " Vundle setup
 let path='$HOME/.config/nvim/bundle'
 call plug#begin('~/.config/nvim/plugged')
+
 " Functionality
-Plug 'kien/ctrlp.vim'
-Plug 'FredKSchott/CoVim'
 Plug 'rking/ag.vim'
 Plug 'tpope/vim-commentary'
 Plug 'junegunn/limelight.vim'
@@ -22,42 +21,29 @@ Plug 'Raimondi/delimitMate'
 Plug 'ohmfox/NerdIgnore'
 Plug 'ohmfox/ProjectLevel'
 Plug 'tpope/vim-git'
+Plug 'benmills/vimux'
+
+" Colors
+Plug 'arcticicestudio/nord-vim'
+
 function! DoRemote(arg)
 	UpdateRemotePlugins
 endfunction
+
 Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-Plug 'itchyny/lightline.vim'
 Plug 'mhinz/vim-signify'
 Plug 'mbbill/undotree'
 Plug 'moll/vim-bbye'
 
 " Syntax & Languages
 Plug 'sheerun/vim-polyglot'
-Plug 'sekel/vim-vue-syntastic'
 Plug 'captbaritone/better-indent-support-for-php-with-html'
-
-" Themes
-Plug 'freeo/vim-kalisi'
-Plug 'flazz/vim-colorschemes'
-Plug 'joshdick/onedark.vim'
 
 Plug 'ervandew/supertab'
 Plug 'jaxbot/semantic-highlight.vim'
-Plug 'ternjs/tern_for_vim', {'do': 'npm install'}
 Plug 'othree/jspc.vim'
 Plug 'moll/vim-node'
 Plug 'junegunn/fzf', { 'do': 'yes \| ./install' }
-
-" Writing Plugins
-Plug 'reedes/vim-wordy'
-Plug 'reedes/vim-lexical'
-Plug 'reedes/vim-textobj-sentence'
-Plug 'reedes/vim-textobj-quote'
-Plug 'reedes/vim-litecorrect'
-Plug 'reedes/vim-pencil'
-Plug 'PProvost/vim-markdown-jekyll'
-Plug 'tpope/vim-markdown'
-Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
@@ -68,9 +54,10 @@ set termguicolors
 syntax enable
 
 set background=dark
-colorscheme onedark
+colorscheme nord
 
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+
+" let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 highlight VertSplit ctermbg=NONE
 set cursorline
 
@@ -79,97 +66,6 @@ set cursorline
 set foldmarker=#--,--
 set foldlevel=0
 set foldmethod=marker
-
-" ------------------------------------------------------------ TIMESTAMPING ON F5
-
-"These timestamps might be a little too detailed for your use (2016-01-19 Tue 10:48 am)
-"The day and time may be redundant and too cluttered
-nmap <F5> a<C-R>=strftime("%Y-%m-%d %a %I:%M %p")<CR><Esc>
-imap <F5> <C-R>=strftime("%Y-%m-%d %a %I:%M %p")<CR>
-
-" ------------------------------------------------------------ LIGHTLINE
-let g:lightline = {
-			\ 'colorscheme': 'seoul256',
-			\ 'component_function': {
-			\   'readonly': 'LightLineReadonly',
-			\   'modified': 'LightLineModified',
-			\   'fileformat': 'LightLineFileformat',
-			\   'ctrlpmark': 'CtrlPMark',
-			\   'filetype': 'LightLineFiletype',
-      \   'syntastic': 'LightLineSyntastic',
-			\   'filename': 'LightLineFilename',
-			\ },
-			\ 'active': {
-			\   'left': [ [ 'filename'], [ 'readonly', 'modified' ]],
-			\   'right': [ [ 'lineinfo', 'syntastic' ], [ 'ctrlpmark' ]]
-			\ },
-			\ 'separator': { 'left': ' ', 'right': ' ', },
-			\ 'subseparator': { 'left': '|', 'right': '|', },
-			\ }
-set noshowmode
-function! LightLineFilename()
-	let fname = expand('%:t')
-	return fname == 'ControlP' ? g:lightline.ctrlp_item :
-				\ fname == '__Tagbar__' ? g:lightline.fname :
-				\ fname =~ '__Gundo\|NERD_tree' ? '' :
-				\ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-				\ &ft == 'unite' ? unite#get_status_string() :
-				\ &ft == 'vimshell' ? vimshell#get_status_string() :
-				\ ('' != fname ? fname : '[No Name]')
-endfunction
-function! LightLineModified()
-	if &filetype == "help"
-		return ""
-	elseif &modified
-		return "💀"
-	elseif &modifiable
-		return "🍕"
-	else
-		return "🍕"
-	endif
-endfunction
-
-function! LightLineSyntastic()
-  if SyntasticStatuslineFlag() == ""
-    return "a"
-  else
-    return "b"
-endfunction
-
-function! LightLineReadonly()
-	if &filetype == "help"
-		return "🐙"
-	elseif &readonly
-		return "🐙"
-	else
-		return ""
-	endif
-endfunction
-function! CtrlPMark()
-	if expand('%:t') =~ 'ControlP'
-		call lightline#link('iR'[g:lightline.ctrlp_regex])
-		return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
-					\ , g:lightline.ctrlp_next], 0)
-	else
-		return ''
-	endif
-endfunction
-let g:ctrlp_status_func = {
-			\ 'main': 'CtrlPStatusFunc_1',
-			\ 'prog': 'CtrlPStatusFunc_2',
-			\ }
-
-function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
-	let g:lightline.ctrlp_regex = a:regex
-	let g:lightline.ctrlp_prev = a:prev
-	let g:lightline.ctrlp_item = a:item
-	let g:lightline.ctrlp_next = a:next
-	return lightline#statusline(0)
-endfunction
-
-function! CtrlPStatusFunc_2(str)
-	return lightline#statusline(0)
-endfunction
 
 " Reload Vim when .vimrc is changed
 augroup reload_vimrc
@@ -186,6 +82,9 @@ nnoremap <Leader>a :Ag
 
 " insert line with <space>Enter
 nnoremap <Leader><CR> o<esc>
+ 
+map <Leader>vp :VimuxPromptCommand<CR>
+map <Leader>vl :VimuxRunLastCommand<CR>
 
 " insert line in insert mode with <ctrl>c
 imap <C-c> <CR><Esc>O
@@ -199,12 +98,8 @@ map <Leader>, <C-^>
 map <Leader>] :bnext<CR>
 map <Leader>[ :bprev<CR>
 map <Leader>ls :buffers<CR>
-"move current line to the end of buffer without moving cursor
-nnoremap <Leader>mv ddGp``
-"copy current line to the end of buffer without moving cursor
-nnoremap <Leader>cp YGp``
+:nnoremap <Leader>s :SemanticHighlightToggle<cr>
 
-map <Leader>sc :setlocal spell<esc>
 
 " ------------------------------------------------------------ INDENTATION
 
@@ -227,7 +122,7 @@ set visualbell                        " disable use visual bells
 set ofu=syntaxcomplete#Complete       " Set omni-completion method.
 set ttyfast                           " more keys/sec == 1337 H4X0R
 
-map K  <Plug>(expand_region_expand)
+map K <Plug>(expand_region_expand)
 " use K to expand select region
 map J <Plug>(expand_region_shrink)
 " use J to shrink select region
@@ -266,6 +161,7 @@ set wrapscan                          " Searches wrap around end of file
 " ------------------------------------------------------------ WILDMENU
 set wildmenu                          " use wildmenu
 set wildchar=<TAB>                    " tab complete commands
+
 """"" IGNORE CERTAIN EXTENSION IN WILDMENU
 set wildignore+=*.jpg,*.jpeg,*.gif,*.png,*.gif,*.psd,*.o,*.obj,*.min.js
 set wildignore+=*/smarty/*,*/vendor/*,*/node_modules/*,*/.git/*,*/.hg/*,*/.svn/*,*/.sass-cache/*,*/log/*,*/tmp/*,*/build/*,*/ckeditor/*
@@ -309,19 +205,6 @@ vmap <Leader>P "+P
 vmap <Leader>r "hy:%s/<C-r>h//gc<left><left><left>
 """""
 
-
-" ------------------------------------------------------------ CTRLP
-let g:ctrlp_match_window = 'bottom,order:ttb'
-let g:ctrlp_switch_buffer = 0
-let g:ctrlp_working_path_mode = 2     " smart path mode
-let g:ctrlp_mru_files = 1             " Enable Most Recently Used files feature
-let g:ctrlp_jump_to_buffer = 2        " Jump to tab AND buffer if already open
-""""" USE AG FOR
-let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
-"""""
-let g:ctrlp_split_window = 1          " <CR> = New Tab
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-
 " ------------------------------------------------------------ SYNTASTIC
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
@@ -332,10 +215,6 @@ nnoremap <Leader>e :SyntasticCheck<CR>
 let g:syntastic_javascript_checkers = ["eslint"]
 let g:syntastic_vue_checkers = ['eslint']
 
-" ------------------------------------------------------------ SUPERTAB
-autocmd FileType javascript let g:SuperTabDefaultCompletionType = "<C-x><C-o>"  
-set completeopt-=preview  
-
 " ------------------------------------------------------------ NERDTREE
 autocmd VimEnter * wincmd p
 noremap <C-\> :NERDTreeToggle<CR>         " use ctrl-\ to open nerdtree
@@ -343,7 +222,7 @@ autocmd StdinReadPre * let s:std_in=1
 """""
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 """""
-let g:NERDTreeWinPos = "left"        " set nerdtree to right side
+let g:NERDTreeWinPos = "left"        " set nerdtree side
 function! s:CloseIfOnlyControlWinLeft()
 	if winnr("$") != 1
 		return
@@ -358,9 +237,13 @@ augroup CloseIfOnlyControlWinLeft
 	au BufEnter * call s:CloseIfOnlyControlWinLeft()
 augroup END
 
-
 " ------------------------------------------------------------ Extra Functions
 autocmd Filetype gitcommit setlocal spell textwidth=72
+
+
+" ------------------------------------------------------------ Insert Math
+map gbc yyp jOscale=2<Esc>:.,+1!bc<CR>kJ
+
 
 " ------------------------------------------------------------ Random
 au BufNewFile,BufRead *.mak set filetype=mako
@@ -369,36 +252,9 @@ au BufNewFile,BufRead *.mak set filetype=mako
 tnoremap <Esc> <C-\><C-n>
 set inccommand=split
 
-
-" ------------------------------------------------------------ Writing
-map <Leader>f :Goyo<cr>
-function! MarkdownOn()
-  set spell spelllang=en_us
-  highlight CursorLine ctermbg=NONE
-endfunction
-
-autocmd Filetype markdown call MarkdownOn()
-
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd,md call pencil#init()
-  autocmd FileType text         call pencil#init()
-augroup END
-autocmd! User GoyoEnter Limelight
-autocmd! User GoyoLeave Limelight!
-augroup lexical
-  autocmd!
-  autocmd FileType markdown,mkd call lexical#init()
-  autocmd FileType textile call lexical#init()
-  autocmd FileType text call lexical#init({ 'spell': 0 })
-augroup END
-let g:lexical#thesaurus_key = '<Leader>t'
-
-let g:jsx_ext_required = 0
-
-set inccommand=split
-autocmd Filetype gitcommit setlocal spell textwidth=72
-
 " ------------------------------------------------------------ Macros
 nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
+
+" ------------------------------------------------------------ JS
+let g:jsx_ext_required = 0
 

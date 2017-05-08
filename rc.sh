@@ -7,4 +7,5 @@ cp tmux.conf ~/.tmux.conf
 cp gitconfig ~/.gitconfig
 cp gitmessage ~/.gitmessage
 cp tarsnaprc ~/.tarsnaprc
+cp tcrc ~/.tcrc
 touch ~/.backuprc

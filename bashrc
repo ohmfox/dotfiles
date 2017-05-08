@@ -40,6 +40,8 @@ shopt -s histappend
 
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
+source ~/.tcrc
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 eval "$(thefuck --alias)"
